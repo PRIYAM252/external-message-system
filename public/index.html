@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Group Chat</title>
+
+<style>
+
+body{
+font-family: Arial;
+text-align:center;
+}
+
+.chat-box{
+width:420px;
+margin:auto;
+border:1px solid gray;
+padding:20px;
+}
+
+#messages{
+height:250px;
+overflow:auto;
+border:1px solid black;
+margin-bottom:10px;
+padding:10px;
+}
+
+.external{
+color:red;
+font-weight:bold;
+}
+
+.banner{
+background:red;
+color:white;
+padding:5px;
+margin-bottom:10px;
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Group Chat System</h2>
+
+<h4>Online Users: <span id="users">0</span></h4>
+
+<div class="chat-box">
+
+<div class="banner" id="warning">
+⚠ External Message Detected
+</div>
+
+<div id="messages"></div>
+
+<input id="email" placeholder="Enter email"><br><br>
+
+<input id="msg" placeholder="Enter message">
+
+<button onclick="sendMsg()">Send</button>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+let socket=io();
+
+function sendMsg(){
+
+let email=document.getElementById("email").value;
+let msg=document.getElementById("msg").value;
+
+socket.emit("chat message",{email:email,msg:msg});
+
+document.getElementById("msg").value="";
+
+}
+
+socket.on("chat message",(data)=>{
+
+let div=document.getElementById("messages");
+let banner=document.getElementById("warning");
+
+if(data.includes("EXTERNAL")){
+div.innerHTML+="<div class='external'>"+data+"</div>";
+banner.style.display="block";
+}else{
+div.innerHTML+="<div>"+data+"</div>";
+banner.style.display="none";
+}
+
+});
+
+socket.on("user count",(count)=>{
+document.getElementById("users").innerText=count;
+});
+
+</script>
+
+</body>
+</html>
